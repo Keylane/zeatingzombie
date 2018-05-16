@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Speech synthesiser</title>
+
+    <link rel="stylesheet" href="style.css">
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <button onclick="sayRandomText()">Switch</button>
+
+    <input type="checkbox" onclick="toggleSounds(7)" id="soundBtnAll" checked/><label for="soundBtnAll">All sounds</label>
+    <input type="checkbox" onclick="toggleSounds(1)" id="soundBtnTalk" checked/><label for="soundBtnTalk">Talk</label>
+    <input type="checkbox" onclick="toggleSounds(2)" id="soundBtnSounds" checked/><label for="soundBtnSounds">Sounds</label>
+    <input type="checkbox" onclick="toggleSounds(4)" id="soundBtnMusic" checked/><label for="soundBtnMusic">Music</label>
+
+    <script src="script.js"></script>
+  </body>
+</html>

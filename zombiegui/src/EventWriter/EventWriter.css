@@ -1,0 +1,6 @@
+.EventWriter {
+    font-family: 'Creepster', cursive;
+    font-size:6vw;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 0 0 16px #FF0000;
+}

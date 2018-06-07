@@ -4,6 +4,10 @@ body {
   font-family: sans-serif;
 }
 
+.floatAround {
+    animation: floatAround 30s ease infinite;
+}
+
 .colorFader {
     animation: colorFader 60s ease infinite;
 }
@@ -15,10 +19,10 @@ body {
     animation:spinRight 1s ease;
 }
 .zoom1 {
-    animation:zoom1 1.5s ease;
+    animation:zoom1 4.5s ease;
 }
 .zoom2 {
-    animation:zoom2 1.5s ease;
+    animation:zoom2 4.5s ease;
 }
 
 @keyframes colorFader {
@@ -33,13 +37,27 @@ body {
 @keyframes spinClockwise { 100% { transform:rotate(360deg); } }
 @keyframes spinCounterClockwise { 100% { transform:rotate(-360deg); } }
 @keyframes zoom1 {
-    50% { transform:scale(2) rotate(30deg) }
-    70% { transform:scale(2) rotate(30deg) }
+    20% { transform:scale(2) rotate(30deg) }
+    90% { transform:scale(2) rotate(30deg) }
     100% { transform:scale(1) rotate(0deg) }
 }
 @keyframes zoom2 {
-    50% { transform:scale(1.5) rotate(-40deg) }
-    70% { transform:scale(1.5) rotate(-40deg) }
+    20% { transform:scale(2) rotate(-40deg) }
+    90% { transform:scale(2) rotate(-40deg) }
     100% { transform:scale(1) rotate(0deg) }
+}
+@keyframes floatAround {
+    0% { top:0%; left: 50%; }
+    10% { top: 20%; left: 60%; }
+    20% { top: 15%; left: 55%; }
+    30% { top: 20%; left: 45%; }
+    40% { top: 0%; left: 40%; }
+    40% { top: 5%; left: 25%; }
+    50% { top: 15%; left: 20%; }
+    60% { top: 25%; left: 45% }
+    70% { top: 3%; left: 35%; }
+    80% { top: 20%; left: 60%; }
+    90% { top: 25%; left: 55%; }
+    100% { top: 0%; left: 50%; }
 }
 

@@ -1,7 +1,30 @@
 import { SWAP_SEATS, MAKE_TOAST} from "./Event";
+import scream from './sound/BangScream.mp3';
+import pop from './sound/pop.mp3';
+
+export const SCREAM_SFX = 'SCREAM';
+export const POP_SFX = 'POP';
 
 const synth = window.speechSynthesis;
-const defaultVoice = 'Xander';
+const defaultVoice = 'Fred';
+
+const init = () => {
+    try {
+        this.sfx = {};
+        this.sfx[SCREAM_SFX] = new Audio(scream);
+        this.sfx[POP_SFX] = new Audio(pop);
+    }
+    catch(e) {
+        alert('Web Audio API is not supported in this browser');
+    }
+};
+
+const playEffect = (name) => {
+    const sound = this.sfx[name];
+    if (sound) {
+        sound.play();
+    }
+};
 
 const say = (text, speechSettings) => {
     const { voice = defaultVoice, rate = 1.0, pitch = 1.0 } = speechSettings;
@@ -60,5 +83,5 @@ const sayEvent = (event, speechSettings) => {
 const getDefaultVoice = () => defaultVoice;
 
 export default {
-    say, sayEvent, listVoices, getDefaultVoice
+    init, playEffect, say, sayEvent, listVoices, getDefaultVoice
 }

@@ -35,8 +35,8 @@ export default class EventWriter extends Component {
                 case SWAP_SEATS: {
                     eventComponent = (
                         <div className="EventWriter">
-                            <div>{`${event.persons[0].name} og ${event.persons[1].name}`}</div>
-                            <div>Byt plads</div>
+                            <div>{`${event.persons[0].name} and ${event.persons[1].name}`}</div>
+                            <div>swap seats</div>
                         </div>);
                     break;
                 }
@@ -44,7 +44,7 @@ export default class EventWriter extends Component {
                     eventComponent = (
                         <div className="EventWriter">
                             <div>{`${event.persons[0].name}`}</div>
-                            <div>Udbring en skål ved dit bord</div>
+                            <div>Make a toast at your table</div>
                         </div>);
                     break;
                 }

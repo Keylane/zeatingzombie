@@ -15,19 +15,16 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Event, {SWAP_SEATS, MAKE_TOAST} from './Event'
-import SpeechController from './speech';
+import SpeechController, { SCREAM_SFX, POP_SFX } from './speech';
 import EventWriter from './EventWriter/EventWriter'
-import ZombieController from './ZombieController'
+import ZombieController, { SCREAM_ANIM, SPEAK_ANIM, SPEAK_SHORT_ANIM } from './ZombieController'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 
 import IconButton from '@material-ui/core/IconButton';
-import Icon from '@material-ui/core/Icon';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ObeyTheZombie from './ObeyTheZombie/ObeyTheZombie';
-
-const ANGRY_DELAY_MS = 2500;
 
 export default class extends Component {
 
@@ -45,17 +42,18 @@ export default class extends Component {
             participants: 'Christian Frost\nChris Lunde Jensen\nAhmad Soheil Abdullatif\nChristos Zoupis Schoinas\nViktor Jeppesen\nMikkel Andersen\nLasse Fabricius' +
                           '\nDawit Legesse Tirore\nAnne Katrine Dybro\nMartin Weithaler\nSøren Larsen\nAnders Julfeldt\nSanne Loomans\nJulie Topp Hansen',
             voice: SpeechController.getDefaultVoice(),
-            pitch: 1,
-            rate: 1,
+            pitch: 19,
+            rate: 8,
             displayObey: false
         };
-
+        SpeechController.init();
+        window.popSfx = () => {
+            SpeechController.playEffect(POP_SFX);
+        };
         (async () => {
             const voices = await SpeechController.listVoices();
             this.setState({voices})
         })();
-
-
     }
 
     formatter = (x) => "." + x;
@@ -113,46 +111,52 @@ export default class extends Component {
     };
 
     obey = async () => {
-        this.setState({ displayObey: true });
-        await this.sleep(3000);
-        this.setState({ displayObey: false });
+        this.fireEvent();
+//        this.setState({ displayObey: true });
+//        await this.sleep(3000);
+//        this.setState({ displayObey: false });
     };
 
 
 
 fireEvent = async () => {
+        ZombieController.zoom();
+        ZombieController.animate(SCREAM_ANIM);         // Start speak animation
+        SpeechController.playEffect(SCREAM_SFX);
+        await this.sleep(5000);
         this.setState({ displayObey: true });
-        await this.sleep(100);
-        SpeechController.say('Obey the zombie', {voice: 'Google UK English Male', rate:0.6, pitch:0.3});
         await this.sleep(3000);
         this.setState({ displayObey: false });
         await this.sleep(1000);
-
-        ZombieController.animate();         // Start speak animation
+        ZombieController.spin();
+        await this.sleep(1000);
 
         const persons = this.getRandomParticipants(2);
         let event;
+        let anim;
         if ((this.state.swapParticipants && Math.random() < 0.5) || !this.state.drinkToast) {
             event = new Event(SWAP_SEATS, [{name: persons[0]}, {name: persons[1]}]);
-            ZombieController.spin();
+            anim = SPEAK_ANIM;
         } else {
             event = new Event(MAKE_TOAST, [{ name: persons[0] }]);
-            ZombieController.zoom();
+            anim = SPEAK_SHORT_ANIM;
         }
-        await this.sleep(ANGRY_DELAY_MS);   // Animates a while before start speaking
         const { voice, rate, pitch} = this.state;
         SpeechController.sayEvent(event, {voice, rate: rate / 10, pitch: pitch / 10});
+        ZombieController.animate(anim);
         this.setState({currentEvent: event});
         if (this.state.delayInSeconds > this.state.minMaxDelay[0] * 60) {
             this.setState({delayInSeconds: this.state.delayInSeconds - 60})
         }
-        await this.sleep(10000);
+        await this.sleep(5000);    // Wait for talk to finish
+        ZombieController.floatAround();
+        await this.sleep(30000);    // Before hiding order
+
         this.setState({currentEvent: null});
     };
 
     tick = () => {
         let countdown = this.state.countdownStartedAt + this.state.delayInSeconds * 1000 - new Date().getTime();
-        console.log(JSON.stringify(this.state))
         if (countdown < 0) {
             this.fireEvent();
             this.resetTimer();
@@ -340,9 +344,9 @@ fireEvent = async () => {
                     <Button onClick={this.toggleTimer} variant="raised" color="primary" className={classes.button}>
                         {this.state.countdownStartedAt ? 'Stop' : 'Start'}
                     </Button>
-
+                    <br />
                     <Button onClick={this.obey} variant="raised" color="primary" className={classes.button}>
-                        animate
+                        Fire event
                     </Button>
 
 

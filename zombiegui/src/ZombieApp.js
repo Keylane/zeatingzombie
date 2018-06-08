@@ -15,18 +15,22 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Event, {SWAP_SEATS, MAKE_TOAST} from './Event'
-import SpeechController, { SCREAM_SFX, POP_SFX } from './speech';
-import EventWriter from './EventWriter/EventWriter'
-import ZombieController, { SCREAM_ANIM, SPEAK_ANIM, SPEAK_SHORT_ANIM } from './ZombieController'
+import SpeechController, { SCREAM_SFX, POP_SFX } from './Controllers/SoundController/SoundController';
+import EventWriter from './Components/EventWriter/EventWriter'
+import ZombieController, { SCREAM_ANIM, SPEAK_ANIM, SPEAK_SHORT_ANIM } from './Controllers/ZombieController/ZombieController'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 
 import IconButton from '@material-ui/core/IconButton';
 import SvgIcon from '@material-ui/core/SvgIcon';
-import ObeyTheZombie from './ObeyTheZombie/ObeyTheZombie';
+import ObeyTheZombie from './Components/ObeyTheZombie/ObeyTheZombie';
+
+const MAX_RECENT_HISTORY = 5;
+const STATUS_ACCEPTED = 1;
 
 export default class extends Component {
+    recentlyChosen = [];
 
     constructor(props) {
         super(props);
@@ -38,9 +42,9 @@ export default class extends Component {
             countdownStartedAt: null,
             nextEventCountdown: 'N/A',
             currentEvent: null,
-            participantsUrl: '',
-            participants: 'Christian Frost\nChris Lunde Jensen\nAhmad Soheil Abdullatif\nChristos Zoupis Schoinas\nViktor Jeppesen\nMikkel Andersen\nLasse Fabricius' +
-                          '\nDawit Legesse Tirore\nAnne Katrine Dybro\nMartin Weithaler\nSøren Larsen\nAnders Julfeldt\nSanne Loomans\nJulie Topp Hansen',
+            participantsUrl: 'https://guarded-lowlands-41173.herokuapp.com/event/1/participants',
+            participants: ['Christian Frost','Chris Lunde Jensen', 'Ahmad Soheil Abdullatif', 'Christos Zoupis Schoinas', 'Viktor Jeppesen', 'Mikkel Andersen', 'Lasse Fabricius' +
+                           'Dawit Legesse Tirore', 'Anne Katrine Dybro', 'Martin Weithaler', 'Søren Larsen', 'Anders Julfeldt', 'Sanne Loomans', 'Julie Topp Hansen'],
             voice: SpeechController.getDefaultVoice(),
             pitch: 19,
             rate: 8,
@@ -89,55 +93,59 @@ export default class extends Component {
         return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
     };
 
+    /**
+     * Get random participants but make sure not to pick someone recently chosen
+     * @param amount
+     * @returns Array of names
+     */
     getRandomParticipants = (amount) => {
-        const participants = this.state.participants.split('\n');
-        const choosen = [];
+        const participants = this.state.participants;
+        const chosen = [];
         if (participants.length > amount) {
-            const usedIndexes = [];
             for (let i = 0; i < amount; i++) {
-                let index = Math.round(Math.random() * (participants.length - 1));
-                while (usedIndexes.includes(index)) {
-                    index = index < participants.length - 1 ? index + 1 : 0;
+                let index;
+                do {
+                    index = Math.round(Math.random() * (participants.length - 1));
+                } while (this.recentlyChosen.includes(index));
+                chosen.push(participants[index]);
+                this.recentlyChosen.push(index);
+                if (this.recentlyChosen.length > Math.min(MAX_RECENT_HISTORY, participants.length - 1)) {
+                    this.recentlyChosen.shift();
                 }
-                choosen.push(participants[index]);
-                usedIndexes.push(index);
+                console.log(this.recentlyChosen);
             }
         }
-        return choosen;
+        return chosen;
     };
 
     sleep = (ms = 0) => {
         return new Promise(r => setTimeout(r, ms));
     };
 
-    obey = async () => {
-        this.fireEvent();
-//        this.setState({ displayObey: true });
-//        await this.sleep(3000);
-//        this.setState({ displayObey: false });
-    };
-
-
+showObeyZombie = (show) => {
+    this.setState({ displayObey: show });
+};
 
 fireEvent = async () => {
         ZombieController.zoom();
         ZombieController.animate(SCREAM_ANIM);         // Start speak animation
         SpeechController.playEffect(SCREAM_SFX);
         await this.sleep(5000);
-        this.setState({ displayObey: true });
+        this.showObeyZombie(true);
         await this.sleep(3000);
-        this.setState({ displayObey: false });
+        this.showObeyZombie(false);
         await this.sleep(1000);
         ZombieController.spin();
         await this.sleep(1000);
 
-        const persons = this.getRandomParticipants(2);
         let event;
         let anim;
         if ((this.state.swapParticipants && Math.random() < 0.5) || !this.state.drinkToast) {
+            const persons = this.getRandomParticipants(2);
             event = new Event(SWAP_SEATS, [{name: persons[0]}, {name: persons[1]}]);
             anim = SPEAK_ANIM;
         } else {
+            const persons = this.getRandomParticipants(1);
             event = new Event(MAKE_TOAST, [{ name: persons[0] }]);
             anim = SPEAK_SHORT_ANIM;
         }
@@ -190,8 +198,17 @@ fireEvent = async () => {
         SpeechController.say('Obey the zombie', {voice, rate: rate / 10, pitch: pitch / 10});
     };
 
-    loadParticipants = () => {
-        console.log();
+    loadParticipants = async () => {
+        if (this.state.participantsUrl.length > 10) {
+            try {
+                const response = await fetch(this.state.participantsUrl);
+                const data = await response.json();
+                const participants = data.filter(d => d.status === STATUS_ACCEPTED).map(d => d.name);
+                this.setState({ participants })
+            } catch (exception) {
+                console.error(`Failed to retrieve user informations: (${exception})`);
+            }
+        }
     };
 
     render() {
@@ -345,7 +362,7 @@ fireEvent = async () => {
                         {this.state.countdownStartedAt ? 'Stop' : 'Start'}
                     </Button>
                     <br />
-                    <Button onClick={this.obey} variant="raised" color="primary" className={classes.button}>
+                    <Button onClick={this.fireEvent} variant="raised" color="primary" className={classes.button}>
                         Fire event
                     </Button>
 

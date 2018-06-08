@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Animated } from 'react-animated-css';
 import './EventWriter.css';
-import { SWAP_SEATS, MAKE_TOAST } from "../Event";
+import { SWAP_SEATS, MAKE_TOAST } from "../../Event";
 
 export default class EventWriter extends Component {
 

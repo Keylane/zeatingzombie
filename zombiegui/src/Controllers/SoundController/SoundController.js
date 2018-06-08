@@ -1,6 +1,6 @@
-import { SWAP_SEATS, MAKE_TOAST} from "./Event";
-import scream from './sound/BangScream.mp3';
-import pop from './sound/pop.mp3';
+import { SWAP_SEATS, MAKE_TOAST} from "../../Event";
+import scream from './BangScream.mp3';
+import pop from './pop.mp3';
 
 export const SCREAM_SFX = 'SCREAM';
 export const POP_SFX = 'POP';
@@ -13,8 +13,7 @@ const init = () => {
         this.sfx = {};
         this.sfx[SCREAM_SFX] = new Audio(scream);
         this.sfx[POP_SFX] = new Audio(pop);
-    }
-    catch(e) {
+    } catch(e) {
         alert('Web Audio API is not supported in this browser');
     }
 };

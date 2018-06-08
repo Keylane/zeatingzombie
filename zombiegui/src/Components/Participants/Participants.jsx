@@ -23,7 +23,11 @@ export default class Participants extends Component {
     loadParticipants = async () => {
         if (this.state.participantsUrl.length > 10) {
             try {
-                const response = await fetch(this.state.participantsUrl);
+                const response = await fetch(`https://cors-anywhere.herokuapp.com/${this.state.participantsUrl}`, {
+                    headers: {
+                        'Origin': 'http://cozy.keylane.dk/'
+                    },
+                });
                 const data = await response.json();
                 const participants = data.filter(d => d.status === PARTICIPANT_STATUS.ACCEPTED).map(d => d.name);
                 this.setState({ participants })

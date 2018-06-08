@@ -1,7 +1,7 @@
 {
-  "homepage" : "http://localhost:8888/cozy/zz/",
+  "homepage" : "http://cozy.keylane.dk/zz/",
   "name": "zombiegui",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^1.0.0",

@@ -75,12 +75,6 @@ export default class extends Component {
         this.setState({[name]: value})
     };
 
-    handleChangeTextField = name => event => {
-        this.setState({
-            [name]: event.target.value,
-        });
-    };
-
     updateParticipants = (participants) => {
         this.setState({ participants })
     };
@@ -219,7 +213,6 @@ export default class extends Component {
                             <Participants
                                 participants={this.state.participants}
                                 updateParticipants={this.updateParticipants}
-                                handleChangeTextField={this.handleChangeTextField}
                                 participantsUrl="https://guarded-lowlands-41173.herokuapp.com/event/1/participants"
                             />
                         </CardContent>

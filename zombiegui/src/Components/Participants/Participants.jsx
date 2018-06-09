@@ -40,6 +40,12 @@ export default class Participants extends Component {
         this.props.updateParticipants(event.target.value.split(/[\n,]+/));
     };
 
+    handleChangeTextField = name => event => {
+        this.setState({
+            [name]: event.target.value,
+        });
+    };
+
     render() {
         return <CardContent>
             <Typography color="textSecondary">
@@ -58,7 +64,7 @@ export default class Participants extends Component {
                 variant="raised" color="primary"
                 margin="none"
                 label="Fetch from url"
-                onChange={this.props.handleChangeTextField('participantsUrl')}
+                onChange={this.handleChangeTextField('participantsUrl')}
                 title={this.state.participantsUrl}
                 value={this.state.participantsUrl}
             />
@@ -72,7 +78,6 @@ export default class Participants extends Component {
     }
 
     static propTypes = {
-        handleChangeTextField: PropTypes.func.isRequired,
         updateParticipants: PropTypes.func.isRequired,
         participantsUrl: PropTypes.string,
         participants: PropTypes.arrayOf(PropTypes.string)

@@ -16,7 +16,6 @@ export default class Participants extends Component {
         super(props);
         this.state = {
             participantsUrl: props.participantsUrl,
-            participants: props.participants
         }
     }
 
@@ -30,11 +29,15 @@ export default class Participants extends Component {
                 });
                 const data = await response.json();
                 const participants = data.filter(d => d.status === PARTICIPANT_STATUS.ACCEPTED).map(d => d.name);
-                this.setState({ participants })
+                this.props.updateParticipants(participants);
             } catch (exception) {
                 console.error(`Failed to retrieve user informations: (${exception})`);
             }
         }
+    };
+
+    participantsTextFieldChanged = (event) => {
+        this.props.updateParticipants(event.target.value.split(/[\n,]+/));
     };
 
     render() {
@@ -43,12 +46,12 @@ export default class Participants extends Component {
                 Participants
             </Typography>
             <TextField
-                value={this.state.participants}
+                value={this.props.participants}
                 variant="raised"
                 color="primary"
                 multiline
                 rows={10}
-                onChange={this.props.handleChangeTextField('participants')}
+                onChange={this.participantsTextFieldChanged}
                 margin="none"
             />
             <TextField
@@ -70,6 +73,7 @@ export default class Participants extends Component {
 
     static propTypes = {
         handleChangeTextField: PropTypes.func.isRequired,
+        updateParticipants: PropTypes.func.isRequired,
         participantsUrl: PropTypes.string,
         participants: PropTypes.arrayOf(PropTypes.string)
     }

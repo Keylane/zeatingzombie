@@ -81,6 +81,10 @@ export default class extends Component {
         });
     };
 
+    updateParticipants = (participants) => {
+        this.setState({ participants })
+    };
+
     millisToMinutesAndSeconds = (millis) => {
         const minutes = Math.floor(millis / 60000);
         const seconds = ((millis % 60000) / 1000).toFixed(0);
@@ -93,7 +97,7 @@ export default class extends Component {
      * @returns Array of names
      */
     getRandomParticipants = (amount) => {
-        const participants = this.state.participants;
+        const participants = this.state.participants.filter(name => name !== '');
         const chosen = [];
         if (participants.length > amount) {
             for (let i = 0; i < amount; i++) {
@@ -195,17 +199,12 @@ export default class extends Component {
     };
 
     render() {
-        const classes = {
-            root: 'aaa',
-            paper: 'bbb'
-        };
-
         return (
             <div id="ZombieApp">
                 <ObeyTheZombie isVisible={this.state.displayObey}/>
 
                 <Menu width={400}>
-                    <Card className={classes.card}>
+                    <Card>
                         <VoiceSelector
                             voice={this.state.voice}
                             rate={this.state.rate}
@@ -215,10 +214,11 @@ export default class extends Component {
                         />
                     </Card>
                     <br/>
-                    <Card className={classes.card}>
+                    <Card>
                         <CardContent>
                             <Participants
                                 participants={this.state.participants}
+                                updateParticipants={this.updateParticipants}
                                 handleChangeTextField={this.handleChangeTextField}
                                 participantsUrl="https://guarded-lowlands-41173.herokuapp.com/event/1/participants"
                             />
@@ -226,13 +226,13 @@ export default class extends Component {
                     </Card>
 
                     <br/>
-                    <Card className={classes.card}>
+                    <Card>
                         <CardContent>
-                            <Typography className={classes.title} color="textSecondary">
+                            <Typography color="textSecondary">
                                 Events
                             </Typography>
 
-                            <div className={classes.root}>
+                            <div>
                                 <Grid container spacing={24}>
                                     <Grid item xs={6}>
                                         <FormControlLabel
@@ -257,12 +257,10 @@ export default class extends Component {
                                         />
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Paper title="Minimum delay between events"
-                                               className={classes.paper}>{this.state.minMaxDelay[0]} min.</Paper>
+                                        <Paper title="Minimum delay between events">{this.state.minMaxDelay[0]} min.</Paper>
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Paper title="Initial delay between events"
-                                               className={classes.paper}>{this.state.minMaxDelay[1]} min.</Paper>
+                                        <Paper title="Initial delay between events">{this.state.minMaxDelay[1]} min.</Paper>
                                     </Grid>
                                 </Grid>
                             </div>
@@ -293,12 +291,11 @@ export default class extends Component {
                     </Card>
                     <br/>
 
-                    <Button onClick={this.toggleCountdownTimer} variant="raised" color="primary"
-                            className={classes.button}>
+                    <Button onClick={this.toggleCountdownTimer} variant="raised" color="primary">
                         {this.state.countdownStartedAt ? 'Stop' : 'Start'}
                     </Button>
                     <br/>
-                    <Button onClick={this.fireEvent} variant="raised" color="secondary" className={classes.button}>
+                    <Button onClick={this.fireEvent} variant="raised" color="secondary">
                         Fire event
                     </Button>
                 </Menu>
